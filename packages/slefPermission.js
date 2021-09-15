@@ -2,22 +2,32 @@
  * @Description: 请输入当前文件描述
  * @Author: @Xin (834529118@qq.com)
  * @Date: 2021-09-13 18:42:26
- * @LastEditTime: 2021-09-14 17:58:57
+ * @LastEditTime: 2021-09-15 18:43:48
  * @LastEditors: @Xin (834529118@qq.com)
  */
-import NProgress from 'nprogress'
-import 'nprogress/nprogress.css'
+import { createDuserStore } from './userStore/index'
 
-export default ({ router, asyncRoutes, loginPath, systemName }) => {
-  const open =  openLoginPage(loginPath)
+export const dfsjAuthSelfPermission = (app, {
+  loginAuth = true,
+  asyncRoutes = [],
+}) => {
+  if (asyncRoutes && !isArray(asyncRoutes)) {
+    throw Error('[dfsj-auth-module]：「asyncRoutes is not Array」')
+  }
 
-  router.beforeEach((to, from, next) => {
-    NProgress.start()
+  const DuserStore = createDuserStore()
 
-    next()
-  })
+  app.use(DuserStore)
 
-  router.afterEach(() => {
-    NProgress.done()
-  })
+  const router = app.config.globalProperties.$router
+
+  const asynLogincRoutesPath = Array.from(
+    new Set(
+      flatAsyncRoute(asyncRoutes)
+        .map(v => v.path)
+        .filter(v => v)
+    )
+  )
+
+  addRoutes(router, defaultRoute)
 }

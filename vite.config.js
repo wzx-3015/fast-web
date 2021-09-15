@@ -2,7 +2,7 @@
  * @Description: 请输入当前文件描述
  * @Author: @Xin (834529118@qq.com)
  * @Date: 2021-09-03 11:00:24
- * @LastEditTime: 2021-09-14 18:25:27
+ * @LastEditTime: 2021-09-15 17:32:21
  * @LastEditors: @Xin (834529118@qq.com)
  */
 import { defineConfig } from 'vite'
@@ -27,7 +27,8 @@ export default defineConfig({
     lib: {
       entry: path.resolve(__dirname, 'packages/index.js'),
       name: 'MyLib',
-      fileName: (format) => `my-lib.${format}.js`
+      formats: ['es'],
+      fileName: format => `index.${format}.js`
     },
     minify: false,
     // rollupOptions: {

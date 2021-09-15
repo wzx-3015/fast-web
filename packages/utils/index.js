@@ -2,7 +2,7 @@
  * @Description: 请输入当前文件描述
  * @Author: @Xin (834529118@qq.com)
  * @Date: 2021-09-11 15:13:05
- * @LastEditTime: 2021-09-11 15:56:22
+ * @LastEditTime: 2021-09-15 18:16:01
  * @LastEditors: @Xin (834529118@qq.com)
  */
 /*
@@ -50,16 +50,19 @@ export const localStorageGetLoginToken = () => {
  * @param {String}  loginPath 登录页面路径
  * @return {Function}
  */
-export const openLoginPage = loginPath => {
-  return (url, SYSTEM_NAME) => {
-    const { href } = window.location
-    if (url) {
-      window.location.replace(`${loginPath}?callbackUrl=${encodeURIComponent(url)}&name=${escape(SYSTEM_NAME)}`)
-      return
-    }
-  
-    window.location.replace(`${loginPath}?callbackUrl=${encodeURIComponent(href)}&name=${escape(SYSTEM_NAME)}`)
+export const openLoginPage = (path, SYSTEM_NAME, url) => {
+  if (!path) {
+    throw new Error('[openLoginPage]: path is not is not defined')
   }
+
+  const { href } = window.location
+
+  if (url) {
+    window.location.replace(`${loginPath}?callbackUrl=${encodeURIComponent(url)}&name=${escape(SYSTEM_NAME)}`)
+    return
+  }
+
+  window.location.replace(`${loginPath}?callbackUrl=${encodeURIComponent(href)}&name=${escape(SYSTEM_NAME)}`)
 }
 
 /**
@@ -181,10 +184,20 @@ export const handleMenu = routes => {
 
 /**
  * @description: Token失效  异常弹窗告警
- * @param {*}
+ * @param {String} Object.message
+ * @param {String} Object.title
+ * @param {String} Object.loginPath
+ * @param {String} Object.systemName
+ * @param {String} Object.url
  * @return {*}
  */
-export const handleRequestTokenElMessageBoxConfirm = (message, title, url = '', cb) => {
+export const handleRequestTokenElMessageBoxConfirm = ({
+  message = '请尝试重新登录！',
+  title = '登录异常',
+  loginPath = '',
+  systemName = '',
+  url = ''
+}) => {
   ElMessageBox.confirm(message, title, {
     confirmButtonText: '确定',
     showClose: false,
@@ -192,7 +205,7 @@ export const handleRequestTokenElMessageBoxConfirm = (message, title, url = '', 
     showCancelButton: false,
     callback: () => {
       localStorageReomveLoginToken()
-      cb()
+      openLoginPage(loginPath, systemName, url)
     },
   })
 }

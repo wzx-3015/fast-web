@@ -1,16 +1,39 @@
 /*
- * @Description: 权限管模块(拦截路由进行路由的匹配以及添加)
+ * @Description: 请输入当前文件描述
  * @Author: @Xin (834529118@qq.com)
- * @Date: 2021-05-06 09:42:37
- * @LastEditTime: 2021-09-13 18:38:55
+ * @Date: 2021-09-11 14:36:02
+ * @LastEditTime: 2021-09-15 18:45:35
  * @LastEditors: @Xin (834529118@qq.com)
  */
 import NProgress from 'nprogress'
 import 'nprogress/nprogress.css'
-import { openLoginPage, addRoutes, flatAsyncRoute } from './utils/index'
+import { addRoutes, flatAsyncRoute, handleModules, handleMenu, mergeRoutes, localStorageGetLoginToken } from './utils/index'
+import { createDuserStore } from './userStore/index'
+import { isArray } from 'lodash-es'
+import { defaultRoute } from './router/index'
+import { login, getUserInfo } from './service/index'
 
-export default ({ router, asyncRoutes, loginPath, systemName }) => {
-  const open =  openLoginPage(loginPath)
+export const dfsjAuthPermission = (app, {
+  loginAuth = true,
+  asyncRoutes = [],
+  loginPath = '',
+  systemName = ''
+}) => {
+  console.log(`[dfsj-auth-module]:「接入权限管理系统」`)
+
+  if (loginAuth && !loginPath) {
+    throw Error('[dfsj-auth-module]：「已开启权限校验，请设置登录跳转地址！」')
+  }
+
+  if (asyncRoutes && !isArray(asyncRoutes)) {
+    throw Error('[dfsj-auth-module]：「asyncRoutes is not Array」')
+  }
+
+  const DuserStore = createDuserStore()
+
+  app.use(DuserStore)
+
+  const router = app.config.globalProperties.$router
 
   const asynLogincRoutesPath = Array.from(
     new Set(
@@ -20,13 +43,30 @@ export default ({ router, asyncRoutes, loginPath, systemName }) => {
     )
   )
 
+  addRoutes(router, defaultRoute)
+
   router.beforeEach((to, from, next) => {
     NProgress.start()
 
     // 开发模式开放所有路由
-    if (LOGINAUTH === 'false') {
+    if (!loginAuth) {
       NProgress.done()
-      next()
+
+      if (asyncRoutes.length) {
+        const menus = handleMenu(addRoutes)
+
+        DuserStore.setUserState({
+          menus,
+          flatMenus: flatAsyncRoute(menus),
+        })
+
+        addRoutes(router, asyncRoutes).then(() => {
+          next({ path: to.path, query: { ...rest }, params: to.params, replace: true })
+        })
+      } else {
+        next()
+      }
+
       return true
     }
 
@@ -37,57 +77,54 @@ export default ({ router, asyncRoutes, loginPath, systemName }) => {
         // ak参数存在  处理登录逻辑
         if (to.query.ak) {
           const { ak, ...rest } = to.query
-          store
-            .dispatch('user/Login', { ak })
-            .then(() => {
-              // 获取用户信息
-              store
-                .dispatch('user/GetUserInfo')
-                .then(() => {
-                  NProgress.done()
-                  addRoutes(router, store.state.user.addRoutes)
 
-                  // 解决新增route不生效
-                  next({ path: to.path, query: { ...rest }, params: to.params, replace: true })
-                })
-                .catch(err => {
-                  handleRequestTokenElMessageBoxConfirm(
-                    err.message,
-                    '登录异常',
-                    window.location.href.replace(/\?ak=(\S*)/, ''),
-                    open
-                  )
-                })
+          login({ ak }, loginPath, systemName).then(() => {
+            getUserInfo(loginPath, systemName).then(res => {
+              const { modules } = res.data
+              const addRoutes = mergeRoutes(handleModules(modules), flatAsyncRoute(asyncRoutes))
+
+              // 生成导航栏信息(处理导航栏信息)
+              const menus = handleMenu(addRoutes)
+
+              DuserStore.setUserState({
+                login: true,
+                ...res.data,
+                addRoutes,
+                menus,
+                flatMenus: flatAsyncRoute(menus),
+              })
+
+              addRoutes(router, store.state.user.addRoutes).then(() => {
+                NProgress.done()
+                next({ path: to.path, query: { ...rest }, params: to.params, replace: true })
+              })
             })
-            .catch(err => {
-              handleRequestTokenElMessageBoxConfirm(
-                err.message,
-                '登录异常',
-                window.location.href.replace(/\?ak=(\S*)/, ''),
-                open
-              )
-            })
+          })
         } else {
           // TOKEN 不存在代表为第一次登录
           if (!localStorageGetLoginToken()) {
             next({ name: '403' })
           } else {
-            store
-              .dispatch('user/GetUserInfo')
-              .then(() => {
-                addRoutes(router, store.state.user.addRoutes).then(() => {
-                  next({ path: to.path, query: to.query, params: to.params, replace: true })
-                })
+            getUserInfo(loginPath, systemName).then(res => {
+              const { modules } = res.data
+              const addRoutes = mergeRoutes(handleModules(modules), flatAsyncRoute(asyncRoutes))
+
+              // 生成导航栏信息(处理导航栏信息)
+              const menus = handleMenu(addRoutes)
+
+              DuserStore.setUserState({
+                login: true,
+                ...res.data,
+                addRoutes,
+                menus,
+                flatMenus: flatAsyncRoute(menus),
               })
-              .catch(err => {
-                handleRequestTokenElMessageBoxConfirm(
-                  err.message,
-                  '获取信息异常,请重新登录',
-                  window.location.href,
-                  open
-                )
+
+              NProgress.done()
+              addRoutes(router, store.state.user.addRoutes).then(() => {
+                next({ path: to.path, query: { ...rest }, params: to.params, replace: true })
               })
-              .finally(() => NProgress.done())
+            })
           }
         }
       } else {

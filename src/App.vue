@@ -2,10 +2,12 @@
  * @Description: 请输入当前文件描述
  * @Author: @Xin (834529118@qq.com)
  * @Date: 2021-09-03 15:10:14
- * @LastEditTime: 2021-09-13 18:51:07
+ * @LastEditTime: 2021-09-15 10:25:02
  * @LastEditors: @Xin (834529118@qq.com)
 -->
 <script setup>
+// import { duseStore } from '../packages/index'
+// console.log(duseStore())
 // This starter template is using Vue 3 <script setup> SFCs
 // Check out https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup
 // import vueDraggableNext from '../lib/vue-draggable-next/index'
@@ -33,7 +35,7 @@
 </template>
 
 <style>
-#app {
+#app { 
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
