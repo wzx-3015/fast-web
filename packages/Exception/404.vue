@@ -2,7 +2,7 @@
  * @Description: 请输入当前文件描述
  * @Author: @Xin (834529118@qq.com)
  * @Date: 2021-03-01 09:44:26
- * @LastEditTime: 2021-09-08 16:08:44
+ * @LastEditTime: 2021-09-16 10:11:52
  * @LastEditors: @Xin (834529118@qq.com)
 -->
 <template>
@@ -30,6 +30,8 @@ export default {
 </script>
 <style scoped lang="less">
 .exception404 {
+  margin: 0;
+  padding: 0;
   text-align: center;
   height: 100vh;
   display: flex;

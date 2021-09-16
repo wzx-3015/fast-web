@@ -2,7 +2,7 @@
  * @Description: 请输入当前文件描述
  * @Author: @Xin (834529118@qq.com)
  * @Date: 2021-09-11 15:13:05
- * @LastEditTime: 2021-09-15 18:16:01
+ * @LastEditTime: 2021-09-16 10:34:36
  * @LastEditors: @Xin (834529118@qq.com)
  */
 /*
@@ -164,7 +164,7 @@ export const handleMenu = routes => {
   return routes.reduce((acc, current) => {
     const { children, ...rest } = current
     if (children && children.length) {
-      if (current.meta.view) {
+      if (current.meta && current.meta.view) {
         acc.push({
           ...rest,
           component: null,
@@ -174,7 +174,7 @@ export const handleMenu = routes => {
         acc.push(...handleMenu(children))
       }
     } else {
-      if (current.meta.view) {
+      if (current.meta && current.meta.view) {
         acc.push({ ...rest, component: null })
       }
     }
@@ -221,5 +221,5 @@ export const addRoutes = (Router, routes) => {
     Router.addRoute(v)
   })
 
-  return Promise.resolve()
+  return Promise.resolve('success')
 }

@@ -2,7 +2,7 @@
  * @Description: 请输入当前文件描述
  * @Author: @Xin (834529118@qq.com)
  * @Date: 2021-09-06 17:53:11
- * @LastEditTime: 2021-09-15 17:06:10
+ * @LastEditTime: 2021-09-16 10:12:00
  * @LastEditors: @Xin (834529118@qq.com)
 -->
 <template>
@@ -58,6 +58,8 @@ export default {
 </script>
 <style scoped lang="less">
 .exception403 {
+  margin: 0;
+  padding: 0;
   text-align: center;
   height: 100vh;
   display: flex;

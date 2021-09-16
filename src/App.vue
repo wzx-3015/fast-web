@@ -2,7 +2,7 @@
  * @Description: 请输入当前文件描述
  * @Author: @Xin (834529118@qq.com)
  * @Date: 2021-09-03 15:10:14
- * @LastEditTime: 2021-09-15 10:25:02
+ * @LastEditTime: 2021-09-16 10:11:25
  * @LastEditors: @Xin (834529118@qq.com)
 -->
 <script setup>
@@ -35,18 +35,8 @@
 </template>
 
 <style>
-#app { 
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
-
-.parent{
-  height: 400px;
-  width: 400px;
-  background-color: #2c3e50;
+*{
+  margin: 0;
+  padding: 0;
 }
 </style>

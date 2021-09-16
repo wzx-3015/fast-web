@@ -2,7 +2,7 @@
  * @Description: 登录、注销、退出等全局请求
  * @Author: @Xin (834529118@qq.com)
  * @Date: 2021-05-06 11:04:15
- * @LastEditTime: 2021-09-15 18:41:58
+ * @LastEditTime: 2021-09-16 10:50:12
  * @LastEditors: @Xin (834529118@qq.com)
  */
 import axios from 'axios'
@@ -88,6 +88,5 @@ export const logout = () => {
       })
       return Promise.reject(res)
     }
-
   })
 }
